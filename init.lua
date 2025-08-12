@@ -23,20 +23,44 @@ minetest.register_node("vumeter:player", {
 
   on_construct = function(pos)
     local meta = minetest.get_meta(pos)
-    meta:set_string("infotext", "Vu-Meter en cours...")
+    meta:set_string("infotext", "Clic pour démarrer le Vu-Meter")
+    meta:set_string("state", "stopped")
     meta:set_int("index", 1)
-    minetest.get_node_timer(pos):start(0.1)
-    minetest.sound_play("son", {
-      pos = pos,
-      gain = 1.0,
-      max_hear_distance = 20,
-    })
+  end,
+
+  on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
+    local meta = minetest.get_meta(pos)
+    local state = meta:get_string("state")
+
+    if state == "stopped" then
+      meta:set_int("index", 1)
+      meta:set_string("state", "playing")
+      meta:set_string("infotext", "Vu-Meter en cours...")
+
+      local handle = minetest.sound_play("son", {
+        pos = pos,
+        gain = 1.0,
+        max_hear_distance = 20,
+      })
+      meta:set_int("sound_handle", handle or -1)
+      minetest.get_node_timer(pos):start(0.1)
+
+    elseif state == "playing" then
+      local handle = meta:get_int("sound_handle")
+      if handle and handle ~= -1 then
+        minetest.sound_stop(handle)
+      end
+      meta:set_string("state", "stopped")
+      meta:set_string("infotext", "Vu-Meter arrêté.")
+      minetest.get_node_timer(pos):stop()
+    end
   end,
 
   on_timer = function(pos, elapsed)
     local meta = minetest.get_meta(pos)
-    local index = tonumber(meta:get_int("index") or 1)
+    if meta:get_string("state") ~= "playing" then return false end
 
+    local index = meta:get_int("index") or 1
     local width = 10
     local height = 10
     local done = true
@@ -56,6 +80,7 @@ minetest.register_node("vumeter:player", {
     end
 
     if done then
+      meta:set_string("state", "stopped")
       meta:set_string("infotext", "Vu-Meter terminé.")
       return false
     end
