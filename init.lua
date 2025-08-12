@@ -3,11 +3,16 @@ local pattern = dofile(minetest.get_modpath("vumeter") .. "/pattern.lua")
 
 -- === Définition des textures de niveaux ===
 local levels = {
-  {name = "off", light = 0},
-  {name = "green", light = 3},
-  {name = "yellow", light = 6},
-  {name = "orange", light = 10},
-  {name = "red", light = 14}
+  {name = "off", light = 0},      -- 0
+  {name = "green", light = 2},    -- 1
+  {name = "green", light = 3},    -- 2
+  {name = "green", light = 4},    -- 3
+  {name = "yellow", light = 6},   -- 4
+  {name = "yellow", light = 7},   -- 5
+  {name = "orange", light = 9},   -- 6
+  {name = "orange", light = 10},  -- 7
+  {name = "red", light = 12},     -- 8
+  {name = "red", light = 14}      -- 9
 }
 
 for _, level in ipairs(levels) do

@@ -4,7 +4,7 @@ import numpy as np
 # === CONFIGURATION ===
 AUDIO_PATH = "son.ogg"
 SAMPLE_INTERVAL_MS = 100  # 100ms = 10x par seconde
-VUMETER_LEVELS = 5        # nombre de niveaux dans le vu-mètre
+VUMETER_LEVELS = 10        # nombre de niveaux dans le vu-mètre
 LUA_FILE_PATH = "pattern.lua"
 
 # === LECTURE DU FICHIER ===
