@@ -1,4 +1,4 @@
-local pattern = dofile(minetest.get_modpath("vumeter") .. "/pattern.lua")
+local patterns = dofile(minetest.get_modpath("vumeter") .. "/pattern.lua")
 
 for i = 1, 10 do
   minetest.register_node("vumeter:level_" .. i, {
@@ -36,16 +36,28 @@ minetest.register_node("vumeter:player", {
   on_timer = function(pos, elapsed)
     local meta = minetest.get_meta(pos)
     local index = tonumber(meta:get_int("index") or 1)
-    local step = pattern[index]
-    if not step then
-      meta:set_string("infotext", "Vu-Meter terminé.")
-      return false
+
+    local width = 10
+    local height = 10
+    local done = true
+
+    for dx = 0, width - 1 do
+      local pattern = patterns[dx + 1]
+      local step = pattern and pattern[index]
+
+      if step then
+        done = false
+        for dy = 0, height - 1 do
+          local p = vector.add(pos, {x = dx - 5, y = dy + 1, z = 0})
+          local node_name = (dy < step) and "vumeter:level_" .. (dy + 1) or "vumeter:off"
+          minetest.set_node(p, {name = node_name})
+        end
+      end
     end
 
-    for i = 0, 9 do
-      local p = vector.add(pos, {x = 0, y = i + 1, z = 0})
-      local node_name = (i < step) and "vumeter:level_" .. (i + 1) or "vumeter:off"
-      minetest.set_node(p, {name = node_name})
+    if done then
+      meta:set_string("infotext", "Vu-Meter terminé.")
+      return false
     end
 
     meta:set_int("index", index + 1)
